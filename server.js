@@ -10,7 +10,7 @@ connectDB();
 const app = express();
 
 app.use(express.json());
-app.use(cors()); 
+app.use(cors());
 
 // Routes
 app.use("/api/auth", require("./src/routes/authRoutes"));
@@ -19,6 +19,7 @@ app.use("/api/grievances", require("./src/routes/grievanceRoutes"));
 app.use("/api/admin", require("./src/routes/adminRoutes"));
 app.use("/api/authority", require("./src/routes/authorityRoutes"));
 app.use("/api/notifications", require("./src/routes/notificationRoutes"));
+app.use("/api", require("./src/routes/tenantRoutes"));
 app.use(errorHandler);
 
 // Start Server
