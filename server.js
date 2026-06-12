@@ -20,6 +20,7 @@ app.use("/api/admin", require("./src/routes/adminRoutes"));
 app.use("/api/authority", require("./src/routes/authorityRoutes"));
 app.use("/api/notifications", require("./src/routes/notificationRoutes"));
 app.use("/api", require("./src/routes/tenantRoutes"));
+app.use("/api", require("./src/routes/departmentRoutes"));
 app.use(errorHandler);
 
 // Start Server
