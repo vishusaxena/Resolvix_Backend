@@ -18,7 +18,7 @@ const InsertUpdateTenant = async (req, res) => {
       tenant.tenantStatus = data.tenantStatus;
       await tenant.save();
     } else {
-      const generatedCode = await generateUniqueTenantCode("TNT", 4);
+      const generatedCode = await generateUniqueTenantCode("TNT", 4, "tenant");
       data.tenantCode = generatedCode;
       tenant = new Tenant(data);
       await tenant.save();

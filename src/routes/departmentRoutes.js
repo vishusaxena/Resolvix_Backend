@@ -7,8 +7,8 @@ const {
 const router = express.Router();
 
 router.post("/department", InsertUpdateDepartment);
-router.get("/department/:id", GetDepartmentById);
-router.get("/department", GetAllDepartments);
+// router.get("/department/:id", GetDepartmentById);
+router.get("/department/:id", GetAllDepartments);
 // router.delete("/department/:id", DeleteDepartment);
 
 module.exports = router;

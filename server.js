@@ -21,6 +21,8 @@ app.use("/api/authority", require("./src/routes/authorityRoutes"));
 app.use("/api/notifications", require("./src/routes/notificationRoutes"));
 app.use("/api", require("./src/routes/tenantRoutes"));
 app.use("/api", require("./src/routes/departmentRoutes"));
+app.use("/api", require("./src/routes/roleRoutes"));
+app.use("/api/data", require("./src/routes/dataRoutes"));
 app.use(errorHandler);
 
 // Start Server

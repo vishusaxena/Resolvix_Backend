@@ -9,6 +9,7 @@ const InsertUpdateDepartment = async (req, res) => {
     //if a tenant already have that department then update. Else create new
     let tenant = await Tenant.findOne({ tenantCode: data.tenantCode });
     let department = await Department.findOne({
+      tenantCode: data.tenantCode,
       departmentCode: data.departmentCode,
     });
 
@@ -17,7 +18,12 @@ const InsertUpdateDepartment = async (req, res) => {
       department.departmentStatus = data.departmentStatus;
       await department.save();
     } else {
-      const generatedCode = await generateUniqueTenantCode("DEP", 3);
+      const generatedCode = await generateUniqueTenantCode(
+        "DEP",
+        3,
+        "department",
+        data.tenantCode,
+      );
       data.departmentCode = generatedCode;
       data.tenantCode = data.tenantCode;
       department = new Department(data);
@@ -36,11 +42,14 @@ const InsertUpdateDepartment = async (req, res) => {
 
 const GetAllDepartments = async (req, res) => {
   try {
-    const tenants = await Tenant.find();
+    console.log("Fetching departments for tenant:", req.params.id);
+    const departments = await Department.find({
+      tenantCode: req.params.id,
+    });
     res.status(200).json({
       status: "success",
-      message: "Tenants fetched successfully",
-      data: tenants,
+      message: "Departments fetched successfully",
+      data: departments,
     });
   } catch (err) {
     res.status(500).json({ status: "error", message: err.message, data: null });
@@ -49,16 +58,18 @@ const GetAllDepartments = async (req, res) => {
 
 const GetDepartmentById = async (req, res) => {
   try {
-    const tenant = await Tenant.findOne({ tenantCode: req.params.id });
-    if (!tenant) {
+    const department = await Department.findOne({
+      departmentCode: req.params.id,
+    });
+    if (!department) {
       return res
         .status(404)
-        .json({ status: "error", message: "Tenant not found", data: null });
+        .json({ status: "error", message: "Department not found", data: null });
     }
     res.status(200).json({
       status: "success",
-      message: "Tenant fetched successfully",
-      data: tenant,
+      message: "Department fetched successfully",
+      data: department,
     });
   } catch (err) {
     res.status(500).json({ status: "error", message: err.message, data: null });
