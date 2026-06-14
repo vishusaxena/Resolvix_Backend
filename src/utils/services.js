@@ -1,7 +1,9 @@
 const Department = require("../models/Department");
+const Grievance = require("../models/Grievance");
 const Roles = require("../models/roles");
 const Tenant = require("../models/Tenant");
 const User = require("../models/User");
+const crypto = require("crypto");
 
 const generateUniqueTenantCode = async (initials, prefixCount, type, code) => {
   if (type === "tenant") {
@@ -23,8 +25,40 @@ const generateUniqueTenantCode = async (initials, prefixCount, type, code) => {
     const count = await User.countDocuments({ tenantCode: code });
     return `${initials}-${String(count + 1).padStart(prefixCount, "0")}`;
   }
+  if (type === "grievance" && code) {
+    const count = await Grievance.countDocuments({ tenantCode: code });
+    return `${initials}-${String(count + 1).padStart(prefixCount, "0")}`;
+  }
+};
+
+const generateAccessKey = () => {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+  const generatePart = (length) => {
+    let part = "";
+    for (let i = 0; i < length; i++) {
+      part += chars[crypto.randomInt(0, chars.length)];
+    }
+    return part;
+  };
+
+  return `${generatePart(4)}-${generatePart(4)}-${generatePart(4)}`;
+};
+
+const generateTrackingId = () => {
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+
+  const part = () =>
+    Array.from(
+      { length: 4 },
+      () => chars[Math.floor(Math.random() * chars.length)],
+    ).join("");
+
+  return `TRK-${part()}-${part()}`;
 };
 
 module.exports = {
   generateUniqueTenantCode,
+  generateAccessKey,
+  generateTrackingId,
 };

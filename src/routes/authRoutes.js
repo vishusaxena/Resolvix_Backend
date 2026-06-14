@@ -4,6 +4,8 @@ const {
   loginUser,
   getProfile,
   GetAllUsers,
+  logintenant,
+  GetTenantData,
 } = require("../controllers/authController");
 const authMiddleware = require("../middleware/auth");
 
@@ -13,5 +15,7 @@ router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.get("/profile", authMiddleware, getProfile);
 router.get("/users/:id", GetAllUsers);
+router.post("/tenantlogin", logintenant);
+router.get("/tenant-info/:id", GetTenantData);
 
 module.exports = router;

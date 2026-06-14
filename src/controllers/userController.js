@@ -1,5 +1,12 @@
 const Grievance = require("../models/Grievance");
 const Feedback = require("../models/Feedback");
+const Tenant = require("../models/Tenant");
+const {
+  generateUniqueTenantCode,
+  generateTrackingId,
+  generateAccessKey,
+} = require("../utils/services");
+const uploadToCloudinary = require("../utils/cloudinaryUpload");
 
 exports.getUserGrievances = async (req, res) => {
   try {
@@ -12,22 +19,74 @@ exports.getUserGrievances = async (req, res) => {
 
 exports.submitGrievance = async (req, res) => {
   try {
-    const { title, description, category, subcategory } = req.body;
-    const newGrievance = new Grievance({
-      userId: req.user.id,
-      title,
-      description,
-      category,
-      subcategory,
-      status: "Pending",
+    const data = req.body;
+    const tenantCode = req.params.id;
+
+    const tenantExists = await Tenant.findOne({
+      tenantCode,
     });
 
-    await newGrievance.save();
-    res.status(201).json({ message: "Grievance submitted successfully" });
+    if (!tenantExists) {
+      return res.status(404).json({
+        status: "error",
+        message: "Tenant not found",
+        data: null,
+      });
+    }
+
+    let uploadedAttachments = [];
+
+    if (data.complaintAttachments?.length) {
+      uploadedAttachments = await uploadToCloudinary(data.complaintAttachments);
+    }
+
+    const grievanceCode = await generateUniqueTenantCode(
+      "GNV",
+      3,
+      "grievance",
+      tenantCode,
+    );
+
+    let trackingCode;
+    let exists = true;
+
+    while (exists) {
+      trackingCode = generateTrackingId();
+
+      exists = await Grievance.exists({
+        trackingId: trackingCode,
+      });
+    }
+
+    const accessKey = generateAccessKey();
+
+    const grievance = new Grievance({
+      grievanceCode,
+      tenantCode,
+      trackingId: trackingCode,
+      accessKey,
+      grievanceDetails: {
+        ...data,
+        complaintAttachments: uploadedAttachments,
+      },
+    });
+
+    await grievance.save();
+
+    return res.status(201).json({
+      status: "success",
+      message: "Grievance created successfully",
+      data: grievance,
+    });
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    return res.status(500).json({
+      status: "error",
+      message: err.message,
+      data: null,
+    });
   }
 };
+
 exports.closeGrievance = async (req, res) => {
   await Grievance.findByIdAndUpdate(req.params.id, { status: "Closed" });
   res.json({ message: "Grievance closed" });

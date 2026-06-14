@@ -1,5 +1,8 @@
 const Tenant = require("../models/Tenant");
-const { generateUniqueTenantCode } = require("../utils/services");
+const {
+  generateUniqueTenantCode,
+  generateAccessKey,
+} = require("../utils/services");
 
 const InsertUpdateTenant = async (req, res) => {
   try {
@@ -19,7 +22,9 @@ const InsertUpdateTenant = async (req, res) => {
       await tenant.save();
     } else {
       const generatedCode = await generateUniqueTenantCode("TNT", 4, "tenant");
+      const accessKey = generateAccessKey();
       data.tenantCode = generatedCode;
+      data.tenantKey = accessKey;
       tenant = new Tenant(data);
       await tenant.save();
     }
