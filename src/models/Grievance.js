@@ -5,7 +5,6 @@ const grievanceSchema = new mongoose.Schema(
     grievanceCode: {
       type: String,
       required: true,
-      unique: true,
       trim: true,
     },
 
@@ -190,7 +189,7 @@ const grievanceSchema = new mongoose.Schema(
 );
 
 // Useful indexes
-grievanceSchema.index({ tenantCode: 1, grievanceCode: 1 });
+grievanceSchema.index({ tenantCode: 1, grievanceCode: 1 }, { unique: true });
 grievanceSchema.index({ tenantCode: 1, trackingId: 1 });
 grievanceSchema.index({ tenantCode: 1, grievanceStatus: 1 });
 grievanceSchema.index({

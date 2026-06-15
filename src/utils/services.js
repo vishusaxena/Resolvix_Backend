@@ -26,8 +26,17 @@ const generateUniqueTenantCode = async (initials, prefixCount, type, code) => {
     return `${initials}-${String(count + 1).padStart(prefixCount, "0")}`;
   }
   if (type === "grievance" && code) {
-    const count = await Grievance.countDocuments({ tenantCode: code });
-    return `${initials}-${String(count + 1).padStart(prefixCount, "0")}`;
+    const lastGrievance = await Grievance.findOne({ tenantCode: code })
+      .sort({ createdAt: -1 })
+      .select("grievanceCode");
+
+    let nextNumber = 1;
+
+    if (lastGrievance) {
+      nextNumber = parseInt(lastGrievance.grievanceCode.split("-")[1]) + 1;
+    }
+
+    return `${initials}-${String(nextNumber).padStart(prefixCount, "0")}`;
   }
 };
 

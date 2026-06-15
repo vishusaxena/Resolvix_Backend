@@ -65,7 +65,12 @@ exports.loginUser = async (req, res) => {
     }
 
     const token = jwt.sign(
-      { id: user._id, role: user.role },
+      {
+        id: user._id,
+        role: user.role,
+        tenantCode: user.tenantCode,
+        userCode: user.userCode,
+      },
       process.env.JWT_SECRET,
       { expiresIn: "1d" },
     );
@@ -179,6 +184,39 @@ exports.GetTenantData = async (req, res) => {
       status: "success",
       message: "Successfully fetched",
       data: { ...tenant.toObject(), totalComplaints },
+    });
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: error.message,
+    });
+  }
+};
+
+exports.GetDepartmentData = async (req, res) => {
+  try {
+    console.log(req.user);
+    const { tenantCode, userCode } = req.user;
+
+    const user = await User.findOne({
+      tenantCode,
+      userCode,
+    });
+    const tenantData = await Tenant.findOne({ tenantCode });
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: "Successfully fetched",
+      data: {
+        ...user.toObject(),
+        tenantName: tenantData?.tenantName,
+      },
     });
   } catch (error) {
     return res.status(500).json({
