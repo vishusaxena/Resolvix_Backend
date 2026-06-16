@@ -79,6 +79,8 @@ exports.GetAllGrievancesByDepartment = async (req, res) => {
         grievanceDetails.complaintSubject
         grievanceDetails.complaintPriority
         createdAt
+        complaintDetails
+        complaintAttachments.url
       `,
       )
       .sort({ createdAt: -1 });
@@ -92,12 +94,18 @@ exports.GetAllGrievancesByDepartment = async (req, res) => {
       action: grievance._id,
     }));
 
+    const details = await Grievance.find({
+      tenantCode,
+      "grievanceDetails.complaintDepartment.departmentCode": user.department,
+      isDeleted: false,
+    });
+
     return res.status(200).json({
       status: "success",
       message: "Successfully fetched",
       count: formattedGrievances.length,
       data: formattedGrievances,
-
+      viewDetails: details,
       headersKey: [
         "Grievance Id",
         "Title",
