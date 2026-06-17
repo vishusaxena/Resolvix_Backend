@@ -1,5 +1,6 @@
 const Department = require("../models/Department");
 const Roles = require("../models/roles");
+const User = require("../models/User");
 
 const getDataOptions = async (req, res) => {
   try {
@@ -66,6 +67,22 @@ const getDataOptions = async (req, res) => {
   }
 };
 
+const getGrievanceOfficers = async (req, res) => {
+  const { department, tenantId } = req.query;
+  const officers = await User.find({
+    department,
+    tenantCode: tenantId,
+    role: "Grievance Officer",
+  });
+
+  res.status(200).json({
+    status: "success",
+    data: officers,
+    message: "Officers fetched Successfully",
+  });
+};
+
 module.exports = {
   getDataOptions,
+  getGrievanceOfficers,
 };
