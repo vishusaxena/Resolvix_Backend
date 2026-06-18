@@ -145,3 +145,37 @@ exports.GetAllGrievancesByDepartment = async (req, res) => {
     });
   }
 };
+
+exports.AssignGrievance = async (req, res) => {
+  const { grievanceCode, tenant, department, assignedTo, assignedCode } =
+    req.body;
+
+  const grievance = await Grievance.findOne({
+    tenantCode: tenant,
+    grievanceCode,
+  });
+
+  if (!grievance) {
+    return res.status(404).json({
+      status: "error",
+      message: "Grievance not found",
+    });
+  }
+
+  grievance.assignedTo = {
+    name: assignedTo,
+    userCode: assignedCode,
+    assignedAt: new Date(),
+    email: "",
+  };
+
+  grievance.grievanceStatus = "Assigned";
+
+  await grievance.save();
+
+  res.status(200).json({
+    status: "success",
+    message: "Assigned Successfully",
+    data: grievance,
+  });
+};

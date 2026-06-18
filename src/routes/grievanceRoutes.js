@@ -5,6 +5,7 @@ const {
   updateGrievanceStatus,
   deleteGrievance,
   GetAllGrievancesByDepartment,
+  AssignGrievance,
 } = require("../controllers/grievanceController");
 const authMiddleware = require("../middleware/auth");
 const roleAuth = require("../middleware/roleAuth");
@@ -21,5 +22,6 @@ router.put(
   updateGrievanceStatus,
 );
 router.delete("/:id", authMiddleware, roleAuth(["admin"]), deleteGrievance);
+router.post("/assign", authMiddleware, AssignGrievance);
 
 module.exports = router;
