@@ -6,6 +6,7 @@ const {
   deleteGrievance,
   GetAllGrievancesByDepartment,
   AssignGrievance,
+  GetTicketsByOfficerId,
 } = require("../controllers/grievanceController");
 const authMiddleware = require("../middleware/auth");
 const roleAuth = require("../middleware/roleAuth");
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.get("/", authMiddleware, getAllGrievances);
 router.get("/department", authMiddleware, GetAllGrievancesByDepartment);
+router.get("/ticket", authMiddleware, GetTicketsByOfficerId);
 router.get("/:id", authMiddleware, getGrievanceById);
 router.put(
   "/:id",

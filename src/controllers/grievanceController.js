@@ -179,3 +179,50 @@ exports.AssignGrievance = async (req, res) => {
     data: grievance,
   });
 };
+
+exports.GetTicketsByOfficerId = async (req, res) => {
+  try {
+    const { tenantCode, userCode } = req.query;
+
+    const grievances = await Grievance.find({
+      tenantCode,
+      "assignedTo.userCode": userCode,
+      isDeleted: false,
+    })
+      .select(
+        `
+        grievanceCode
+        grievanceStatus
+        grievanceDetails.complaintSubject
+        grievanceDetails.complaintPriority
+        createdAt
+        complaintDetails
+        complaintAttachments.url
+      `,
+      )
+      .sort({ createdAt: -1 });
+
+    const formattedGrievances = grievances.map((grievance) => ({
+      grievanceId: grievance.grievanceCode,
+      title: grievance.grievanceDetails?.complaintSubject,
+      priority: grievance.grievanceDetails?.complaintPriority,
+      dateRaised: grievance.createdAt,
+      status: grievance.grievanceStatus,
+      action: grievance._id,
+    }));
+
+    return res.status(200).json({
+      status: "success",
+      message: "Successfully fetched",
+      count: formattedGrievances.length,
+      data: formattedGrievances,
+    });
+  } catch (error) {
+    console.error("GetTicketsByOfficerId Error:", error);
+    return res.status(500).json({
+      status: "error",
+      message: error.message,
+      data: null,
+    });
+  }
+};
